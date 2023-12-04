@@ -77,17 +77,10 @@ namespace IND_KDM
             switch (e.KeyCode)
             {
                 case Keys.A:
-                    _graph.AddNode(20, 20, _graph.LastValue + 1);
-                    Status.Show($"Добавлена вершина с номером {_graph.LastValue}");
-                    Listing.AddLine($"Добавлена вершина с номером {_graph.LastValue}");
+                    AddNode();
                     break;
                 case Keys.E:
-                    if (_graph.Count == 0)
-                    {
-                        Status.Show("Сначала добавьте хотя бы одну вершину");
-                        return;
-                    }
-                    _stateMachine.ChangeState(new EdgeAddState());
+                    SwitchToEdgeMode();
                     break;
             }
 
@@ -96,9 +89,7 @@ namespace IND_KDM
 
         private void onButtonAddClick(object sender, EventArgs e)
         {
-            _graph.AddNode(20, 20, _graph.LastValue + 1);
-            Status.Show($"Добавлена вершина с номером {_graph.LastValue}");
-            Listing.AddLine($"Добавлена вершина с номером {_graph.LastValue}");
+            AddNode();
         }
 
         private void onButtonClearClick(object sender, EventArgs e)
@@ -110,30 +101,12 @@ namespace IND_KDM
 
         private void onButtonEdgeClick(object sender, EventArgs e)
         {
-            if (_graph.Count == 0)
-            {
-                Status.Show("Сначала добавьте хотя бы одну вершину");
-                return;
-            }
-
-            _stateMachine.ChangeState(new EdgeAddState());
+            SwitchToEdgeMode();
         }
 
         private void onButtonTableClick(object sender, EventArgs e)
         {
-            if (_tableForm != null)
-            {
-                _tableForm.Refresh();
-                _tableForm.Focus();
-                return;
-            }
-
-            actionPanel.Enabled = false;
-            graphCanvas.Enabled = false;
-
-            _tableForm = new TableForm(_graph);
-            _tableForm.FormClosed += OnTableFormClosed;
-            _tableForm.Show(this);
+            OpenTableForm();
         }
 
         private void OnTableFormClosed(object sender, FormClosedEventArgs e)
@@ -191,17 +164,55 @@ namespace IND_KDM
 
         private void onPaintButtonClick(object sender, EventArgs e)
         {
+            PaintGraph();
+        }
+
+        private void onClearColorButtonClick(object sender, EventArgs e)
+        {
+            ClearColor();
+        }
+
+        private void AddNode() {
+            _graph.AddNode(20, 20, _graph.LastValue + 1);
+            Status.Show($"Добавлена вершина с номером {_graph.LastValue}");
+            Listing.AddLine($"Добавлена вершина с номером {_graph.LastValue}");
+        }
+
+        private void SwitchToEdgeMode() {
             if (_graph.Count == 0)
             {
                 Status.Show("Сначала добавьте хотя бы одну вершину");
                 return;
             }
+            _stateMachine.ChangeState(new EdgeAddState());
+        }
 
+        private void OpenTableForm() {
+            if (_tableForm != null)
+            {
+                _tableForm.Refresh();
+                _tableForm.Focus();
+                return;
+            }
+
+            actionPanel.Enabled = false;
+            graphCanvas.Enabled = false;
+
+            _tableForm = new TableForm(_graph);
+            _tableForm.FormClosed += OnTableFormClosed;
+            _tableForm.Show(this);
+        }
+
+        private void PaintGraph() {
+            if (_graph.Count == 0)
+            {
+                Status.Show("Сначала добавьте хотя бы одну вершину");
+                return;
+            }
             GraphPaint.Do(_graph);
         }
 
-        private void onClearColorButtonClick(object sender, EventArgs e)
-        {
+        private void ClearColor() {
             if (_graph.Count == 0)
             {
                 Status.Show("Сначала добавьте хотя бы одну вершину");
